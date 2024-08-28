@@ -62,7 +62,7 @@ option(SPDLOG_BUILD_ALL "Build all artifacts" OFF)
 option(SPDLOG_BUILD_SHARED "Build shared library" OFF)
 
 # precompiled headers option
-option(SPDLOG_ENABLE_PCH "Build static or shared library using precompiled header to speed up compilation time" OFF)
+option(SPDLOG_ENABLE_PCH "Build static or shared library using precompiled header to speed up compilation time" ON)
 
 # build position independent code
 option(SPDLOG_BUILD_PIC "Build position independent code (-fPIC)" OFF)
@@ -360,4 +360,17 @@ if(SPDLOG_INSTALL)
     # Support creation of installable packages
     # ---------------------------------------------------------------------------------------
     include(cmake/spdlogCPack.cmake)
+else()
+    install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}" PATTERN "fmt/bundled" EXCLUDE)
+    install(
+        TARGETS spdlog spdlog_header_only
+        EXPORT spdlog
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+    if(NOT SPDLOG_USE_STD_FORMAT AND NOT SPDLOG_FMT_EXTERNAL AND NOT SPDLOG_FMT_EXTERNAL_HO)
+        install(DIRECTORY include/${PROJECT_NAME}/fmt/bundled/
+                DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/fmt/bundled/")
+    endif()
 endif()
